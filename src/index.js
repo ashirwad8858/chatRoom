@@ -14,16 +14,20 @@ const publicDirectryPath = path.join(__dirname,'../public')
 
 app.use(express.static(publicDirectryPath))
 
-let count = 0
+
 io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
-    socket.emit('countUpdate',count)
+    socket.emit('message','Welcome')  //sending message to client from server
+
+socket.on('clientMessage',(msg)=>{
+    io.emit('message',msg)
+})
     
-    socket.on('increment',()=>{
-        count++
-        // socket.emit('countUpdate',count)
-        io.emit('countUpdate',count)
-    })
+    // socket.on('increment',()=>{
+    //     count++
+    //     // socket.emit('countUpdate',count)
+    //     io.emit('countUpdate',count)
+    // })
 })
 
 server.listen(port,()=>{
