@@ -10,7 +10,13 @@ socket.on('location',(lati,long)=>{
 document.querySelector('#message-form').addEventListener('submit',(e)=>{
     e.preventDefault() //preventing the default behaviour of form. like refreshing page.
     let msg = e.target.elements.clientmsg.value
-    socket.emit('clientMessage',msg)
+    socket.emit('clientMessage',msg,(returnMsg)=>{
+        if(returnMsg){
+            return console.log(returnMsg)
+        }
+        
+        console.log(msg)
+    })
 })
 
 
@@ -25,6 +31,8 @@ document.querySelector('#location').addEventListener('click',()=>{
         socket.emit('clientLocation',{
             latitude:position.coords.latitude,
             longitude:position.coords.longitude
+        },(resMsg)=>{
+            console.log(resMsg)
         })
     })
 })
