@@ -28,6 +28,10 @@ io.on('connection',(socket)=>{
         io.emit('message','A user has left')
     })
 
+    socket.on('clientLocation',(coords)=>{
+        io.emit('message',`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+    })
+
     // socket.on('increment',()=>{
     //     count++
     //     // socket.emit('countUpdate',count)
