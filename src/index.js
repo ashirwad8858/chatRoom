@@ -4,6 +4,7 @@ const http = require('http')
 const socketio = require('socket.io') 
 
 
+// Creating express server
 const app = express()
 const server = http.createServer(app)
 const io = socketio(server)
@@ -13,9 +14,16 @@ const publicDirectryPath = path.join(__dirname,'../public')
 
 app.use(express.static(publicDirectryPath))
 
-
-io.on('connection',()=>{
+let count = 0
+io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
+    socket.emit('countUpdate',count)
+    
+    socket.on('increment',()=>{
+        count++
+        // socket.emit('countUpdate',count)
+        io.emit('countUpdate',count)
+    })
 })
 
 server.listen(port,()=>{
