@@ -1,5 +1,11 @@
 const socket = io()
 
+
+const $messageForm = document.querySelector('#message-form')
+const $messagFormInput = $messageForm.querySelector('input')
+const $messagFormButton = $messageForm.querySelector('button')
+const $sendLocationButton = document.querySelector('#location')
+
 socket.on('message',(msg)=>{
     console.log(msg)
 })
@@ -7,10 +13,16 @@ socket.on('message',(msg)=>{
 socket.on('location',(lati,long)=>{
     console.log(lati,' ',long)
 })
-document.querySelector('#message-form').addEventListener('submit',(e)=>{
+
+$messageForm.addEventListener('submit',(e)=>{
     e.preventDefault() //preventing the default behaviour of form. like refreshing page.
+    $messagFormButton.setAttribute('disabled','disabled')
     let msg = e.target.elements.clientmsg.value
     socket.emit('clientMessage',msg,(returnMsg)=>{
+        $messagFormButton.removeAttribute('disabled')
+        $messagFormInput.value=''
+        $messagFormInput.focus()
+
         if(returnMsg){
             return console.log(returnMsg)
         }
@@ -21,13 +33,14 @@ document.querySelector('#message-form').addEventListener('submit',(e)=>{
 
 
 
-document.querySelector('#location').addEventListener('click',()=>{
+$sendLocationButton.addEventListener('click',()=>{
     if(!navigator.geolocation){
         return alert('Geoclocation is not supported by your browser')
     }
 
+    $sendLocationButton.setAttribute('disabled','disabled')
     navigator.geolocation.getCurrentPosition((position)=>{
-        
+        $sendLocationButton.removeAttribute('disabled')
         socket.emit('clientLocation',{
             latitude:position.coords.latitude,
             longitude:position.coords.longitude
