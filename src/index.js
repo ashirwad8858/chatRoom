@@ -19,10 +19,15 @@ io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
     socket.emit('message','Welcome')  //sending message to client from server
 
-socket.on('clientMessage',(msg)=>{
-    io.emit('message',msg)
-})
+    socket.broadcast.emit('message','A new user joined')
+    socket.on('clientMessage',(msg)=>{
+        io.emit('message',msg)
+    })
     
+    socket.on('disconnect',()=>{
+        io.emit('message','A user has left')
+    })
+
     // socket.on('increment',()=>{
     //     count++
     //     // socket.emit('countUpdate',count)
