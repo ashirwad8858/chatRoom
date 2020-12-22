@@ -5,9 +5,19 @@ const $messageForm = document.querySelector('#message-form')
 const $messagFormInput = $messageForm.querySelector('input')
 const $messagFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector('#location')
+const $message = document.querySelector('#messages')  // here I will render html script
 
+
+
+const messageTemplate = document.querySelector('#message-template').innerHTML //will access rendring division html
 socket.on('message',(msg)=>{
     console.log(msg)
+    const html = Mustache.render(messageTemplate, {
+        msg 
+    })
+
+    $message.insertAdjacentHTML('beforeend',html)
+
 })
 
 socket.on('location',(lati,long)=>{
