@@ -8,8 +8,10 @@ const $sendLocationButton = document.querySelector('#location')
 const $message = document.querySelector('#messages')  // here I will render html script
 
 
-
 const messageTemplate = document.querySelector('#message-template').innerHTML //will access rendring division html
+const locationMesageTemplate = document.querySelector('#loction-message-template').innerHTML
+
+
 socket.on('message',(msg)=>{
     console.log(msg)
     const html = Mustache.render(messageTemplate, {
@@ -20,8 +22,14 @@ socket.on('message',(msg)=>{
 
 })
 
-socket.on('location',(lati,long)=>{
-    console.log(lati,' ',long)
+socket.on('locationMessage',(url)=>{
+    console.log(url)
+    const html = Mustache.render(locationMesageTemplate,{
+        url
+    })
+
+    $message.insertAdjacentHTML('beforeend',html)
+
 })
 
 $messageForm.addEventListener('submit',(e)=>{
