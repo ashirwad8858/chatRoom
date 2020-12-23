@@ -19,16 +19,22 @@ app.use(express.static(publicDirectryPath))
 
 io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
-    socket.emit('message',generateMessage('Welcome'))  //sending message to client from server
 
-    socket.broadcast.emit('message',generateMessage('A new user joined'))
+
+    socket.on('join', ({ username ,room})=>{
+        socket.join(room)
+        socket.emit('message',generateMessage('Welcome'))  //sending message to client from server
+        socket.broadcast.to(room).emit('message',generateMessage(`${username} has joined!`))
+    
+    })
+
     socket.on('clientMessage',(msg,callback)=>{
         const filter = new Filter()
         if(filter.isProfane(msg)){
             return callback('profnilyt is not allowed')
         }
         
-        io.emit('message',generateMessage(msg))
+        io.to('abc').emit('message',generateMessage(msg))
         callback('Delivered')
     })
     

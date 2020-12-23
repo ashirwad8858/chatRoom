@@ -12,6 +12,12 @@ const messageTemplate = document.querySelector('#message-template').innerHTML //
 const locationMesageTemplate = document.querySelector('#loction-message-template').innerHTML
 
 
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix:true })
+
+
+socket.emit('join',{ username, room })
+
+
 socket.on('message',(msg)=>{
     console.log(msg)
     const html = Mustache.render(messageTemplate, {
