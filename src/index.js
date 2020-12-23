@@ -3,6 +3,7 @@ const path = require('path')
 const http = require('http')
 const socketio = require('socket.io') 
 const Filter = require('bad-words')
+const { generateMessage } = require('./utils/mesage')
 
 
 // Creating express server
@@ -18,25 +19,25 @@ app.use(express.static(publicDirectryPath))
 
 io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
-    socket.emit('message','Welcome')  //sending message to client from server
+    socket.emit('message',generateMessage('Welcome'))  //sending message to client from server
 
-    socket.broadcast.emit('message','A new user joined')
+    socket.broadcast.emit('message',generateMessage('A new user joined'))
     socket.on('clientMessage',(msg,callback)=>{
         const filter = new Filter()
         if(filter.isProfane(msg)){
             return callback('profnilyt is not allowed')
         }
         
-        io.emit('message',msg)
+        io.emit('message',generateMessage(msg))
         callback('Delivered')
     })
     
     socket.on('disconnect',()=>{
-        io.emit('message','A user has left')
+        io.emit('message',generateMessage('A user has left'))
     })
 
     socket.on('clientLocation',(coords,callback)=>{
-        io.emit('locationMessage',`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+        io.emit('locationMessage',generateMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback('Location Delivered')
     })
 
