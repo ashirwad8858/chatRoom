@@ -6,7 +6,7 @@ const users = []
     //validate data
     if(!username || !room){
         return {
-            error: 'Username and room is required';
+            error: 'Username and room is required'
         }
     }
 
