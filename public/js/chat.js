@@ -10,7 +10,7 @@ const $message = document.querySelector('#messages')  // here I will render html
 
 const messageTemplate = document.querySelector('#message-template').innerHTML //will access rendring division html
 const locationMesageTemplate = document.querySelector('#loction-message-template').innerHTML
-
+const sidbarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix:true })
 
@@ -45,6 +45,15 @@ socket.on('locationMessage',(message)=>{
 
     $message.insertAdjacentHTML('beforeend',html)
 
+})
+
+socket.on('roomData',({ room, users })=>{
+    console.log(room, users)
+    const html = Mustache.render(sidbarTemplate,{
+        room,
+        users
+    })
+    document.querySelector('#sidebar').innerHTML = html
 })
 
 $messageForm.addEventListener('submit',(e)=>{
