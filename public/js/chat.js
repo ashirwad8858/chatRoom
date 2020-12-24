@@ -14,6 +14,29 @@ const sidbarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix:true })
 
+const autoScroll = ()=>{
+    // new Message element
+    const $newMessage = $message.lastElementChild
+
+    // Heigth og new element
+    const newMessageStyles = getComputedStyle($newMessage)
+    const newMessgeMagin = parseInt(newMessageStyles.marginBottom)
+    const newmessageHeight = $newMessage.offsetHeight + newMessgeMagin
+
+    //Visisble height
+    const vesibleHeight= $message.offsetHeight
+
+    // Height of message container
+    const containerHeight = $message.scrollHeight
+
+    // How for I have scroled?
+    const scrolloffset = $message.scrollTop + vesibleHeight
+
+    if(containerHeight - newmessageHeight <= scrolloffset){
+        $message.scrollTop =$message.scrollHeight
+    }
+
+}
 
 socket.emit('join',{ username, room },(error)=>{
     if(error){
@@ -33,6 +56,7 @@ socket.on('message',(msg)=>{
     })
 
     $message.insertAdjacentHTML('beforeend',html)
+    autoScroll()
 
 })
 
@@ -44,6 +68,7 @@ socket.on('locationMessage',(message)=>{
     })
 
     $message.insertAdjacentHTML('beforeend',html)
+    autoScroll()
 
 })
 
