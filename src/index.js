@@ -4,6 +4,7 @@ const http = require('http')
 const socketio = require('socket.io') 
 const Filter = require('bad-words')
 const { generateMessage } = require('./utils/mesage')
+const { addUser, removeUser, getUser, getUserInRoom } = require('./utils/users')
 
 
 // Creating express server
@@ -21,29 +22,55 @@ io.on('connection',(socket)=>{
     console.log('New WebScoket connection')
 
 
-    socket.on('join', ({ username ,room})=>{
-        socket.join(room)
-        socket.emit('message',generateMessage('Welcome'))  //sending message to client from server
-        socket.broadcast.to(room).emit('message',generateMessage(`${username} has joined!`))
+    socket.on('join', (options,callback)=>{
+        const { error, user } = addUser({ id:socket.id, ...options})
+
+        if(error){
+            return callback(error)
+        }
+        socket.join(user.room)
+        socket.emit('message',generateMessage('Admin','Welcome'))  //sending message to client from server
+        socket.broadcast.to(user.room).emit('Admin','message',generateMessage(`${user.username} has joined!`))
+        io.to(user.room).emit('roomData',{
+            room:user.room,
+            users:getUserInRoom(user.room)
+        })
+        callback()
     
     })
 
     socket.on('clientMessage',(msg,callback)=>{
+        const user = getUser(socket.id)
+
+
+
         const filter = new Filter()
         if(filter.isProfane(msg)){
             return callback('profnilyt is not allowed')
         }
         
-        io.to('abc').emit('message',generateMessage(msg))
+        io.to(user.room).emit('message',generateMessage(user.username,msg))
         callback('Delivered')
     })
     
     socket.on('disconnect',()=>{
-        io.emit('message',generateMessage('A user has left'))
+        const user = removeUser(socket.id)
+
+        if(user){
+            io.to(user.room).emit('message',generateMessage(user.username,`${user.username} has left`))
+            io.to(user.room).emit('roomData',{
+                room:user.room,
+                users:getUserInRoom(user.room)
+            })
+        }
+
     })
 
     socket.on('clientLocation',(coords,callback)=>{
-        io.emit('locationMessage',generateMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('locationMessage',generateMessage(user.username,`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback('Location Delivered')
     })
 

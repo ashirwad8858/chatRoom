@@ -6,13 +6,13 @@ const users = []
     //validate data
     if(!username || !room){
         return {
-            error: 'Username and room is required';
+            error: 'Username and room is required'
         }
     }
 
     // checking for existing user
-    const existingUser = user.find((user)=>{
-        return user.room === room && user.username === username
+    const existingUser = users.find((item)=>{
+        return item.room === room && item.username === username
     })
 
     if(existingUser){
