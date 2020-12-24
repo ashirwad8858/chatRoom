@@ -29,20 +29,24 @@ io.on('connection',(socket)=>{
             return callback(error)
         }
         socket.join(user.room)
-        socket.emit('message',generateMessage('Welcome'))  //sending message to client from server
-        socket.broadcast.to(user.room).emit('message',generateMessage(`${user.username} has joined!`))
+        socket.emit('message',generateMessage('Admin','Welcome'))  //sending message to client from server
+        socket.broadcast.to(user.room).emit('Admin','message',generateMessage(`${user.username} has joined!`))
 
         callback()
     
     })
 
     socket.on('clientMessage',(msg,callback)=>{
+        const user = getUser(socket.id)
+
+
+
         const filter = new Filter()
         if(filter.isProfane(msg)){
             return callback('profnilyt is not allowed')
         }
         
-        io.to('abc').emit('message',generateMessage(msg))
+        io.to(user.room).emit('message',generateMessage(user.username,msg))
         callback('Delivered')
     })
     
@@ -50,14 +54,17 @@ io.on('connection',(socket)=>{
         const user = removeUser(socket.id)
 
         if(user){
-            io.to(user.room).emit('message',generateMessage(`${user.username} has left`))
+            io.to(user.room).emit('message',generateMessage(user.username,`${user.username} has left`))
             
         }
 
     })
 
     socket.on('clientLocation',(coords,callback)=>{
-        io.emit('locationMessage',generateMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('locationMessage',generateMessage(user.username,`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback('Location Delivered')
     })
 
